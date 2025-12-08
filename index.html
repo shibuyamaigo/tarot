@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Personal Arcana</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div id="app-background"></div>
+
+    <section id="title-screen" class="screen active">
+        <div class="title-content">
+            <h1 class="main-title">THE ORACLE</h1>
+            <p class="sub-title">Seek your arcana</p>
+            <button id="start-btn" class="glow-btn">ENTER</button>
+        </div>
+    </section>
+
+    <section id="input-screen" class="screen">
+        <div class="input-container">
+            <h2>Personal Data</h2>
+            <div class="form-group">
+                <label>Birth Date</label>
+                <div class="date-selects">
+                    <select id="year"></select>
+                    <select id="month"></select>
+                    <select id="day"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Current Age</label>
+                <select id="age"></select>
+            </div>
+            <button id="calc-btn">REVEAL</button>
+        </div>
+    </section>
+
+    <section id="result-screen" class="screen">
+        
+        <div id="by-section" class="view-slide active-view">
+            <div class="card-display">
+                <div class="card-frame fibonacci">
+                    <img id="by-image" src="" alt="Birth Card">
+                </div>
+                <div class="card-info fade-in-up">
+                    <span class="label">Birth Year Card</span>
+                    <h2 id="by-name"></h2>
+                    <p id="by-theme"></p>
+                </div>
+            </div>
+            <div class="scroll-hint">Swipe Up for Transit Year</div>
+        </div>
+
+        <div id="ty-section" class="view-slide">
+            <div class="carousel-container">
+                <div class="carousel-track" id="ty-track">
+                    </div>
+            </div>
+            <div class="ty-indicators">
+                <span id="prev-year-label">Last</span>
+                <span id="curr-year-label" class="active">This Year</span>
+                <span id="next-year-label">Next</span>
+            </div>
+            <div class="scroll-hint">Swipe Down for Birth Card</div>
+        </div>
+
+    </section>
+
+    <script src="js/data.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
