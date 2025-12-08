@@ -1,0 +1,750 @@
+:root {
+    --gold: #d4af37;
+    --dark-bg: #111;
+    --glass: rgba(0, 0, 0, 0.75); /* 背景を少し濃く */
+    --fibonacci-aspect: 1.618;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--dark-bg);
+    color: #fff;
+    min-height: 100vh;
+    overflow: hidden;
+    user-select: none; /* テキスト選択防止 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+/* 背景画像 */
+#app-background {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: url('../images/title.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.3; /* 最初は暗めに */
+    transition: opacity 1.5s ease, background-image 1s ease;
+    z-index: -1;
+}
+
+/* アプリのコンテナ */
+#app-container {
+    width: 100%;
+    max-width: 480px;
+    min-width: 320px;
+    height: 100vh;
+    position: relative;
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+}
+
+/* 画面共通 */
+.screen {
+    position: absolute;
+    width: 100%; 
+    height: 100%;
+    top: 0; left: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease;
+    padding: 20px;
+}
+.screen.active { display: flex; }
+
+/* タイトル画面 */
+.title-content {
+    text-align: center;
+    z-index: 10;
+}
+.main-title {
+    font-size: 3rem; margin-bottom: 0.5rem; letter-spacing: 5px;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+.sub-title {
+    font-size: 1rem; color: #aaa; letter-spacing: 3px; margin-bottom: 3rem; text-transform: uppercase;
+}
+/* エントランスボタン */
+.entrance-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    margin-top: 2rem;
+}
+
+.entrance-btn {
+    background: rgba(20, 20, 20, 0.8);
+    border: 2px solid rgba(212, 175, 55, 0.6);
+    border-radius: 15px;
+    padding: 20px;
+    width: 280px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    backdrop-filter: blur(15px);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.entrance-btn:hover {
+    border-color: var(--gold);
+    background: rgba(212, 175, 55, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(212, 175, 55, 0.3);
+}
+
+
+.btn-text {
+    display: block;
+    color: var(--gold);
+    font-size: 1rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
+
+.btn-desc {
+    display: block;
+    color: #aaa;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+.entrance-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.entrance-btn:hover::before {
+    left: 100%;
+}
+
+/* 入力フォーム (Select Box Styling) */
+.input-container {
+    background: rgba(20, 20, 20, 0.85);
+    backdrop-filter: blur(15px);
+    padding: 2.5rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+    width: 90%; max-width: 400px;
+    text-align: center;
+}
+.input-container h2 { margin-bottom: 1.5rem; font-weight: 300; letter-spacing: 2px; color: var(--gold); }
+
+.date-selects { display: flex; gap: 8px; justify-content: center; }
+select {
+    padding: 12px;
+    background: #222;
+    border: 1px solid #444;
+    color: #fff;
+    font-size: 1.1rem;
+    border-radius: 6px;
+    outline: none;
+    -webkit-appearance: none; /* ブラウザ標準の矢印を消す */
+    text-align: center;
+    cursor: pointer;
+}
+/* スマホでドラムロールっぽく見せるためのハック */
+select:focus { border-color: var(--gold); }
+#year { width: 40%; }
+#month, #day { width: 28%; }
+#age { width: 100%; text-align: center; margin-bottom: 1rem;}
+
+button#calc-btn {
+    width: 100%; padding: 15px; margin-top: 10px;
+    background: var(--gold);
+    color: #000; border: none;
+    font-weight: bold; letter-spacing: 2px;
+    cursor: pointer; transition: 0.3s;
+    border-radius: 4px;
+}
+
+/* 結果画面修正 */
+.view-slide {
+    width: 100%; height: 100%;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* 垂直方向中央 */
+    position: relative;
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 10; /* ボタンがクリックできるように */
+}
+.view-slide.active-view { 
+    display: flex;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* カード表示 */
+.card-display {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card-frame {
+    width: 65vw; max-width: 320px;
+    aspect-ratio: 1 / var(--fibonacci-aspect);
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 30px rgba(212, 175, 55, 0.2);
+    border: 2px solid rgba(212, 175, 55, 0.6);
+    overflow: hidden;
+    position: relative;
+    z-index: 1; /* 背景より手前に */
+    opacity: 0;
+    transform: translateY(20px) rotateX(10deg);
+    animation: cardAppear 1.5s ease-out 0.3s forwards;
+}
+.card-frame img { 
+    width: 100%; height: 100%; object-fit: cover; 
+    transition: transform 0.5s ease;
+}
+.card-frame:hover img { transform: scale(1.02); }
+
+/* テキスト情報（ここを修正：中央寄せ） */
+.card-info {
+    text-align: center;
+    width: 100%;
+    padding: 10px 20px;
+    z-index: 2;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: textAppear 1.2s ease-out 0.8s forwards;
+}
+.label {
+    display: block; font-size: 0.75rem; color: var(--gold); 
+    letter-spacing: 2px; margin-bottom: 8px; text-transform: uppercase;
+}
+.card-info h2 { 
+    font-size: 1.4rem; margin-bottom: 8px; font-weight: 400; letter-spacing: 1px;
+}
+.card-info p { 
+    font-size: 0.95rem; color: #ccc; font-style: italic; 
+    font-family: serif;
+}
+
+/* 年選択サムネイル */
+.year-thumbnails {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin: 20px 0;
+    padding: 15px;
+}
+
+.thumbnail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.6;
+    transform: scale(0.8);
+}
+
+.thumbnail img {
+    width: 40px;
+    height: 65px; /* フィボナッチ比に近く */
+    object-fit: cover;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.thumbnail span {
+    font-size: 0.7rem;
+    color: #aaa;
+    margin-top: 5px;
+    letter-spacing: 1px;
+}
+
+.thumbnail.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.thumbnail.active img {
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+
+.thumbnail.active span {
+    color: var(--gold);
+    font-weight: bold;
+}
+
+.thumbnail:hover:not(.active) {
+    opacity: 0.8;
+    transform: scale(0.9);
+}
+
+/* メインカード表示 */
+.main-card-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    margin: 20px 0;
+}
+
+.main-card-frame {
+    width: 65vw; 
+    max-width: 320px;
+    aspect-ratio: 1 / var(--fibonacci-aspect);
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 30px rgba(212, 175, 55, 0.2);
+    border: 2px solid rgba(212, 175, 55, 0.6);
+    overflow: hidden;
+    position: relative;
+    animation: mainCardAppear 1.5s ease-out forwards;
+}
+
+.main-card-frame img {
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover;
+    transition: transform 0.5s ease;
+    cursor: pointer;
+}
+
+.main-card-frame:hover img {
+    transform: scale(1.05);
+}
+
+.main-card-info {
+    text-align: center;
+    margin-top: 20px;
+    animation: mainTextAppear 1.2s ease-out 0.5s forwards;
+    opacity: 0;
+}
+
+.main-label {
+    display: block; 
+    font-size: 0.9rem; 
+    color: var(--gold); 
+    letter-spacing: 2px; 
+    margin-bottom: 10px; 
+    text-transform: uppercase;
+}
+
+.main-card-info h2 { 
+    font-size: 1.6rem; 
+    margin-bottom: 10px; 
+    font-weight: 400; 
+    letter-spacing: 1px;
+    color: #fff;
+}
+
+.main-card-info p { 
+    font-size: 1rem; 
+    color: #ccc; 
+    font-style: italic; 
+    font-family: serif;
+}
+
+@keyframes mainCardAppear {
+    0% { opacity: 0; transform: translateY(30px) scale(0.9); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes mainTextAppear {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ナビゲーションボタン */
+.nav-btn {
+    position: absolute;
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    letter-spacing: 1px;
+    z-index: 100; /* 確実にクリックできるように */
+}
+.nav-btn:hover {
+    background: rgba(212, 175, 55, 0.3);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+}
+.nav-up {
+    bottom: 80px;
+    right: 30px;
+}
+.nav-down {
+    bottom: 80px;
+    right: 30px;
+}
+
+/* ホームボタン */
+.home-btn {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    background: rgba(100, 100, 100, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    letter-spacing: 1px;
+    z-index: 100; /* 確実にクリックできるように */
+}
+.home-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+/* 年変更ボタン */
+.year-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    z-index: 110;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.year-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+.year-nav-btn.prev-year {
+    left: -50px;
+}
+
+.year-nav-btn.next-year {
+    right: -50px;
+}
+
+
+
+/* ヒントテキスト */
+.scroll-hint {
+    position: absolute; bottom: 160px;
+    font-size: 0.75rem; color: #666; letter-spacing: 1px;
+    animation: pulse 2s infinite; pointer-events: none;
+}
+/* アニメーション */
+@keyframes pulse { 0% { opacity: 0.2; } 50% { opacity: 0.8; } 100% { opacity: 0.2; } }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+@keyframes cardAppear {
+    0% { opacity: 0; transform: translateY(20px) rotateX(10deg) scale(0.9); }
+    50% { opacity: 0.7; transform: translateY(10px) rotateX(5deg) scale(0.95); }
+    100% { opacity: 1; transform: translateY(0) rotateX(0deg) scale(1); }
+}
+@keyframes textAppear {
+    0% { opacity: 0; transform: translateY(30px); }
+    60% { opacity: 0; }
+    100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+/* モーダルスタイル */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    animation: modalFadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: linear-gradient(145deg, rgba(20, 20, 20, 0.95), rgba(40, 40, 40, 0.95));
+    margin: 5% auto;
+    padding: 30px;
+    border: 2px solid var(--gold);
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(20px);
+}
+
+.close-btn {
+    color: var(--gold);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s;
+    z-index: 1001;
+    position: relative;
+    display: block;
+    padding: 5px;
+}
+
+.close-btn:hover {
+    color: #fff;
+}
+
+.modal-card-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.modal-card-frame {
+    width: 200px;
+    aspect-ratio: 1 / var(--fibonacci-aspect);
+    border-radius: 10px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    border: 2px solid rgba(212, 175, 55, 0.6);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.modal-card-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modal-card-info {
+    text-align: center;
+    width: 100%;
+}
+
+.modal-card-info h2 {
+    color: var(--gold);
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+.modal-card-info > p {
+    color: #ccc;
+    font-style: italic;
+    margin-bottom: 20px;
+}
+
+.modal-card-description {
+    text-align: left;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.modal-card-description h3 {
+    color: var(--gold);
+    margin-bottom: 10px;
+    font-size: 1rem;
+    letter-spacing: 1px;
+}
+
+.modal-card-description p {
+    color: #ddd;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.7); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* QAセクション */
+.qa-container {
+    padding: 30px;
+    text-align: center;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+}
+
+.qa-header h2 {
+    color: var(--gold);
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+
+.qa-header p {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+}
+
+.level-selector h3 {
+    color: #fff;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+}
+
+.level-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.level-btn {
+    background: rgba(20, 20, 20, 0.8);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-radius: 10px;
+    padding: 15px 25px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    width: 80%;
+    max-width: 300px;
+}
+
+.level-btn:hover {
+    border-color: var(--gold);
+    background: rgba(212, 175, 55, 0.1);
+    transform: translateY(-2px);
+}
+
+.question-area {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    backdrop-filter: blur(10px);
+}
+
+.question-area h3 {
+    color: #fff;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    font-weight: normal;
+}
+
+.reaction-area {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.reaction-btn {
+    background: rgba(100, 100, 100, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 25px;
+    padding: 10px 15px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    font-size: 0.9rem;
+}
+
+.reaction-btn:hover {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: var(--gold);
+    transform: scale(1.05);
+}
+
+.reaction-btn.selected {
+    background: rgba(212, 175, 55, 0.3);
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.qa-controls {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.control-btn {
+    background: var(--gold);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+    background: #e6c547;
+    transform: translateY(-2px);
+}
+
+.control-btn.secondary {
+    background: rgba(100, 100, 100, 0.3);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.control-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.qa-home-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+}
+
+.input-home-btn {
+    margin-top: 20px;
+    width: 100%;
+}
