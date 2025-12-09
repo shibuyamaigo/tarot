@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Personal Arcana</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div id="app-background"></div>
+
+    <div id="app-container">
+        <section id="title-screen" class="screen active">
+        <div class="title-content">
+            <h1 class="main-title">THE ORACLE</h1>
+            <p class="sub-title">Seek your arcana</p>
+            <div class="entrance-buttons">
+                <button id="calculator-btn" class="entrance-btn">
+                    <span class="btn-text">PERSONAL ARCANA</span>
+                    <span class="btn-desc">パーソナル運勢計算</span>
+                </button>
+                <button id="essence-btn" class="entrance-btn">
+                    <span class="btn-text">ESSENCE JOURNEY</span>
+                    <span class="btn-desc">本質を見つける旅</span>
+                </button>
+                <button id="shichusuimei-btn" class="entrance-btn">
+                    <span class="btn-text">SHICHUSUIMEI</span>
+                    <span class="btn-desc">四柱推命モード</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section id="input-screen" class="screen">
+        <div class="input-container">
+            <h2>Personal Data</h2>
+            <div class="form-group">
+                <label>Birth Date</label>
+                <div class="date-selects">
+                    <select id="year"></select>
+                    <select id="month"></select>
+                    <select id="day"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Current Age</label>
+                <select id="age"></select>
+            </div>
+            <button id="calc-btn">REVEAL</button>
+        </div>
+    </section>
+
+    <section id="result-screen" class="screen">
+        
+        <div id="by-section" class="view-slide active-view">
+            <div class="card-display">
+                <div class="card-frame fibonacci">
+                    <img id="by-image" src="" alt="Birth Card">
+                </div>
+                <div class="card-info fade-in-up">
+                    <span class="label">Birth Year Card</span>
+                    <h2 id="by-name"></h2>
+                    <p id="by-theme"></p>
+                </div>
+            </div>
+            <div class="scroll-hint">Swipe Up for Transit Year</div>
+            <button class="nav-btn nav-up" id="to-ty-btn">Next ↑</button>
+            <button class="home-btn" id="home-btn">HOME</button>
+        </div>
+
+        <div id="ty-section" class="view-slide">
+            
+            <!-- Arcana background image at the top of the card -->
+            <div class="arcana-background">
+                <img src="images/arcana.png" alt="Arcana" class="arcana-image">
+            </div>
+            
+            <div class="ty-interactive-area">
+                <!-- Previous Thumbnails -->
+                <div class="side-thumbnails">
+                    <div class="thumbnail" id="thumb-minus2" data-offset="-2">
+                        <img src="" alt="Card">
+                        <span></span>
+                    </div>
+                    <div class="thumbnail" id="thumb-minus1" data-offset="-1">
+                        <img src="" alt="Card">
+                        <span></span>
+                    </div>
+                </div>
+
+                <!-- Main Card -->
+                <div class="main-card-display">
+                    <div class="main-card-frame">
+                        <img id="main-ty-image" src="" alt="Main Card">
+                        <!-- 年変更ボタン -->
+                        <button class="year-nav-btn prev-year" id="prev-year-btn">←</button>
+                        <button class="year-nav-btn next-year" id="next-year-btn">→</button>
+                    </div>
+                    <div class="main-card-info">
+                        <span class="main-label" id="main-ty-label"></span>
+                        <h2 id="main-ty-name"></h2>
+                        <p id="main-ty-theme"></p>
+                    </div>
+                </div>
+
+                <!-- Next Thumbnails -->
+                <div class="side-thumbnails">
+                    <div class="thumbnail" id="thumb-plus1" data-offset="1">
+                        <img src="" alt="Card">
+                        <span></span>
+                    </div>
+                    <div class="thumbnail" id="thumb-plus2" data-offset="2">
+                        <img src="" alt="Card">
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hidden current thumbnail for data consistency -->
+            <div class="thumbnail active" id="thumb-current" data-offset="0" style="display: none;">
+                <img src="" alt="Card">
+                <span></span>
+            </div>
+
+            <div class="scroll-hint">Swipe Down for Birth Card</div>
+            <button class="nav-btn nav-down" id="to-by-btn">Back ↓</button>
+            <button class="home-btn" id="home-btn-ty">HOME</button>
+        </div>
+
+    </section>
+
+    <section id="qa-screen" class="screen">
+        <div class="qa-container">
+            <div class="qa-header">
+                <h2 id="qa-title">本質を見つける旅</h2>
+                <p id="qa-subtitle">深い質問とリアクションで心を開く</p>
+            </div>
+            
+            <div class="level-selector" id="level-selector">
+                <h3>レベルを選択してください</h3>
+                <div class="level-buttons">
+                    <button class="level-btn" data-level="1">軽やか - 日常の話題</button>
+                    <button class="level-btn" data-level="2">価値観 - 人生の考え</button>
+                    <button class="level-btn" data-level="3">秘密 - 内面の真実</button>
+                    <button class="level-btn" data-level="4">シャドウ - 影の部分</button>
+                    <button class="level-btn" data-level="5">親密 - 恋愛と愛情</button>
+                    <button class="level-btn danger" data-level="6">禁断 - 危険な領域</button>
+                </div>
+                
+                <div class="sub-level-selector" id="sub-level-selector" style="display: none;">
+                    <h4 id="sub-level-title">段階を選択してください</h4>
+                    <div class="sub-level-buttons">
+                        <button class="sub-level-btn" data-sub="1">段階1</button>
+                        <button class="sub-level-btn" data-sub="2">段階2</button>
+                        <button class="sub-level-btn" data-sub="3">段階3</button>
+                    </div>
+                    <button class="back-to-levels-btn" id="back-to-main-levels">レベル選択に戻る</button>
+                </div>
+            </div>
+
+            <div class="qa-main" id="qa-main" style="display: none;">
+                <div class="question-area">
+                    <h3 id="current-question">ここに質問が表示されます</h3>
+                </div>
+                
+                <div class="reaction-area">
+                    <button class="reaction-btn spicy">🔥 やばい</button>
+                    <button class="reaction-btn same">🙋 同じく！</button>
+                    <button class="reaction-btn depends">🤔 人による</button>
+                    <button class="reaction-btn naughty">😈 悪い子</button>
+                </div>
+                
+                <div class="progress-area">
+                    <div class="progress-text">
+                        <span id="current-progress">質問 1</span> / <span id="total-questions">12</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+                
+                <div class="qa-controls">
+                    <button id="next-question-btn" class="control-btn">次の質問</button>
+                    <button id="back-to-levels-btn" class="control-btn secondary">レベル選択に戻る</button>
+                </div>
+            </div>
+            
+            <button class="home-btn qa-home-btn" id="qa-home-btn">HOME</button>
+        </div>
+    </section>
+
+    <section id="shichusuimei-screen" class="screen">
+        <div class="shichusuimei-container">
+            <div class="shichusuimei-header">
+                <h2>四柱推命</h2>
+                <p>あなたの四つの柱を読み解きます</p>
+            </div>
+
+            <div class="shichusuimei-input-container" id="shichusuimei-input">
+                <div class="date-selects">
+                    <select id="s-year"></select>
+                    <select id="s-month"></select>
+                    <select id="s-day"></select>
+                </div>
+                <button id="shichusuimei-calc-btn">鑑定する</button>
+            </div>
+
+            <div class="shichusuimei-result-container" id="shichusuimei-result" style="display: none;">
+                <!-- 動物占いメイン結果 -->
+                <div class="animal-main-result">
+                    <div class="animal-group-badge" id="animal-group-badge">月グループ</div>
+                    <div class="animal-main-card">
+                        <div class="animal-icon" id="animal-main-icon">🐺</div>
+                        <div class="animal-name" id="animal-main-name">穏やかな狼</div>
+                        <div class="animal-description" id="animal-main-description">平和主義で協調性抜群。争いを避け、みんなで楽しむことを好む</div>
+                    </div>
+                </div>
+
+                <!-- グループ詳細 -->
+                <div class="group-details" id="group-details">
+                    <h3 id="group-name">月グループ</h3>
+                    <p id="group-description">感受性豊かで情緒的。直感力に優れ、芸術的センスを持つ</p>
+                </div>
+
+                <button id="shichusuimei-back-btn" class="control-btn secondary">戻る</button>
+            </div>
+            
+            <button class="home-btn shichusuimei-home-btn" id="shichusuimei-home-btn">HOME</button>
+        </div>
+    </section>
+
+    </div>
+
+    <!-- Transit Year カード詳細ポップアップ -->
+    <div id="card-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-modal">&times;</span>
+            <div class="modal-card-display">
+                <div class="modal-card-frame">
+                    <img id="modal-card-image" src="" alt="Card">
+                </div>
+                <div class="modal-card-info">
+                    <h2 id="modal-card-name"></h2>
+                    <p id="modal-card-theme"></p>
+                </div>
+            </div>
+            
+            <!-- Tab Navigation -->
+            <div class="modal-tabs">
+                <button class="tab-btn active" data-tab="features">特徴</button>
+                <button class="tab-btn" data-tab="implications">暗示</button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="modal-tab-content active" id="tab-content-features">
+                <div class="modal-card-description">
+                    <h3>テーマ</h3>
+                    <p id="modal-card-features-theme"></p>
+                    <h3>関連ワード</h3>
+                    <p id="modal-card-features-traits"></p>
+                    <h3>アドバイス</h3>
+                    <p id="modal-card-features-advice"></p>
+                </div>
+            </div>
+            <div class="modal-tab-content" id="tab-content-implications">
+                <div class="modal-card-description">
+                    <p id="modal-card-implications-upright"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Birth Card 詳細ポップアップ -->
+    <div id="birth-card-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-birth-modal">&times;</span>
+            <div class="modal-card-display">
+                <div class="modal-card-frame">
+                    <img id="birth-modal-card-image" src="" alt="Birth Card">
+                </div>
+                <div class="modal-card-info">
+                    <h2 id="birth-modal-card-name"></h2>
+                    <p id="birth-modal-card-theme"></p>
+                </div>
+            </div>
+            
+            <!-- Tab Navigation -->
+            <div class="modal-tabs">
+                <button class="tab-btn active" data-tab="birth-theme">テーマ</button>
+                <button class="tab-btn" data-tab="birth-symbol">象徴</button>
+                <button class="tab-btn" data-tab="birth-traits">特性</button>
+                <button class="tab-btn" data-tab="birth-celebrities">有名人</button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="modal-tab-content active" id="birth-tab-content-theme">
+                <div class="modal-card-description">
+                    <p id="birth-card-theme-content"></p>
+                </div>
+            </div>
+            <div class="modal-tab-content" id="birth-tab-content-symbol">
+                <div class="modal-card-description">
+                    <p id="birth-card-symbol-content"></p>
+                </div>
+            </div>
+            <div class="modal-tab-content" id="birth-tab-content-traits">
+                <div class="modal-card-description">
+                    <h3>ポジティブな面</h3>
+                    <p id="birth-card-positive-traits"></p>
+                    <h3>ネガティブな面</h3>
+                    <p id="birth-card-negative-traits"></p>
+                </div>
+            </div>
+            <div class="modal-tab-content" id="birth-tab-content-celebrities">
+                <div class="modal-card-description">
+                    <p id="birth-card-celebrities-content"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
