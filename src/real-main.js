@@ -153,6 +153,7 @@ window.state = state;
 class RealTelemetry {
   constructor(appState) {
     this.state = appState;
+    this.lastLogTime = 0; // ログ制御用
   }
 
   update(dt) {
@@ -197,23 +198,44 @@ class RealTelemetry {
       if (cadenceStatus) cadenceStatus.textContent = '未接続';
     }
 
-    // 斜度は自動生成（将来的にスマートローラーから取得）
-    const baseGrade = Math.sin(t * 0.075) * 8.0 + Math.sin(t * 0.031 + 1.4) * 5.5;
-    s.grade = clamp(baseGrade, -20, 25);
+    // 斜度制御（停止時は固定、走行時は距離ベースで変化）
+    if (s.telemetry.speed > 1.0) {
+      // 走行中：距離ベースで斜度変化（より自然）
+      const distancePhase = s.distanceKm * 0.5; // 2kmごとに1周期
+      const baseGrade = Math.sin(distancePhase * 0.8) * 6.0 + Math.sin(distancePhase * 0.3 + 1.2) * 4.0;
+      s.grade = clamp(baseGrade, -15, 20);
+    } else {
+      // 停止中：斜度を徐々に平坦化（自然な停止）
+      s.grade = s.grade * 0.995; // 緩やかに0%に戻る
+      if (Math.abs(s.grade) < 0.1) s.grade = 0;
+    }
 
     // 実パワーから速度を逆算（リアルデータ必須）
     if (targetPower > 0) {
       targetRealSpeed = solveCyclingSpeedKph(targetPower, s.grade, s.weight);
-      console.log(`🚴 REAL速度計算: ${targetRealSpeed.toFixed(1)}km/h (${targetPower}W, ${s.grade.toFixed(1)}%)`);
+      
+      // 1秒に1回だけログ出力
+      if (t - this.lastLogTime >= 1.0) {
+        console.log(`🚴 REAL速度計算: ${targetRealSpeed.toFixed(1)}km/h (${targetPower}W, ${s.grade.toFixed(1)}%)`);
+        this.lastLogTime = t;
+      }
     } else {
       targetRealSpeed = 0; // パワー0なら完全停止
-      console.log(`⚠️ センサー未接続: 速度0km/h`);
+      
+      // 停止時も1秒に1回だけ
+      if (t - this.lastLogTime >= 1.0) {
+        console.log(`⚠️ センサー未接続: 速度0km/h`);
+        this.lastLogTime = t;
+      }
     }
 
     // ブーストボーナス
     if (boostActive) {
       targetRealSpeed *= 1.2;
-      console.log(`🚀 BOOST効果: ${targetRealSpeed.toFixed(1)}km/h`);
+      // ブースト時のみ追加ログ（1秒制限内）
+      if (t - this.lastLogTime < 0.1) { // 上記ログの直後のみ
+        console.log(`🚀 BOOST効果: ${targetRealSpeed.toFixed(1)}km/h`);
+      }
     }
 
     // スムージング
@@ -242,33 +264,100 @@ class RealRenderer {
     const { width, height } = this.ctx.canvas;
     const s = this.state;
 
-    // 背景クリア
-    this.ctx.fillStyle = '#1a1a2e';
-    this.ctx.fillRect(0, 0, width, height);
+    // 時間帯に応じた背景グラデーション
+    const timeColor = this.getTimeColor(s.timeOfDay);
+    this.drawSkyGradient(timeColor);
 
-    // 道路描画
-    this.drawRoad();
-
-    // プレイヤー描画（数式メイン）
-    this.drawPlayer();
-
-    // 風景描画（数式）
+    // 遠景→近景の順で描画
+    this.drawMountains();
     this.drawScenery();
+    this.drawRoad();
+    this.drawPlayer();
+    
+    // UI要素
+    this.drawStatusOverlay();
+  }
+
+  getTimeColor(timeOfDay) {
+    // 0=朝, 0.25=昼, 0.5=夕, 0.75=夜, 1=朝
+    if (timeOfDay < 0.25) {
+      return { top: '#87CEEB', bottom: '#E0F6FF' }; // 朝
+    } else if (timeOfDay < 0.5) {
+      return { top: '#87CEFA', bottom: '#F0F8FF' }; // 昼
+    } else if (timeOfDay < 0.75) {
+      return { top: '#FF6347', bottom: '#FFE4B5' }; // 夕
+    } else {
+      return { top: '#191970', bottom: '#483D8B' }; // 夜
+    }
+  }
+
+  drawSkyGradient(colors) {
+    const { width, height } = this.ctx.canvas;
+    const gradient = this.ctx.createLinearGradient(0, 0, 0, height * 0.6);
+    gradient.addColorStop(0, colors.top);
+    gradient.addColorStop(1, colors.bottom);
+    
+    this.ctx.fillStyle = gradient;
+    this.ctx.fillRect(0, 0, width, height * 0.6);
+  }
+
+  drawMountains() {
+    const { width, height } = this.ctx.canvas;
+    const s = this.state;
+    
+    // 遠景の山々
+    this.ctx.fillStyle = '#6B7280';
+    for (let i = 0; i < 8; i++) {
+      const x = (i * 120 + s.parallaxPhase * 3) % (width + 200) - 100;
+      const h = 80 + Math.sin(i * 0.7) * 40;
+      
+      // 三角形の山
+      this.ctx.beginPath();
+      this.ctx.moveTo(x, height * 0.6);
+      this.ctx.lineTo(x + 60, height * 0.6 - h);
+      this.ctx.lineTo(x + 120, height * 0.6);
+      this.ctx.closePath();
+      this.ctx.fill();
+    }
+  }
+
+  drawScenery() {
+    const { width, height } = this.ctx.canvas;
+    const s = this.state;
+    
+    // 中景の木々
+    this.ctx.fillStyle = '#22C55E';
+    for (let i = 0; i < 15; i++) {
+      const x = (i * 60 + s.parallaxPhase * 8) % (width + 100) - 50;
+      const h = 30 + Math.sin(i * 0.8 + s.elapsed * 0.1) * 10;
+      
+      // シンプルな木の形
+      this.ctx.fillRect(x + 20, height * 0.7 - h, 20, h); // 幹
+      this.ctx.beginPath();
+      this.ctx.arc(x + 30, height * 0.7 - h, 25, 0, Math.PI * 2); // 葉
+      this.ctx.fill();
+    }
   }
 
   drawRoad() {
     const { width, height } = this.ctx.canvas;
     const s = this.state;
     
-    this.ctx.fillStyle = '#333';
-    this.ctx.fillRect(0, height - 100, width, 100);
+    // 道路面
+    this.ctx.fillStyle = '#374151';
+    this.ctx.fillRect(0, height * 0.75, width, height * 0.25);
     
-    // 斜度表示
-    this.ctx.fillStyle = '#666';
-    this.ctx.fillRect(width - 200, height - 120, 180, 20);
-    this.ctx.fillStyle = '#fff';
-    this.ctx.font = '14px monospace';
-    this.ctx.fillText(`Grade: ${s.grade.toFixed(1)}%`, width - 190, height - 107);
+    // 道路の白線（動的）
+    this.ctx.strokeStyle = '#FFFFFF';
+    this.ctx.lineWidth = 4;
+    this.ctx.setLineDash([20, 20]);
+    this.ctx.lineDashOffset = -s.roadPhase * 40;
+    
+    this.ctx.beginPath();
+    this.ctx.moveTo(0, height * 0.85);
+    this.ctx.lineTo(width, height * 0.85);
+    this.ctx.stroke();
+    this.ctx.setLineDash([]);
   }
 
   drawPlayer() {
@@ -276,30 +365,53 @@ class RealRenderer {
     const s = this.state;
     
     const x = width / 2;
-    const y = height - 200;
+    const y = height * 0.8;
+    const speed = s.telemetry.speed;
     
-    // プレイヤーを数式で描画
-    this.ctx.fillStyle = '#ff6b6b';
-    this.ctx.fillRect(x - 20, y - 40, 40, 40);
+    // サイクリストのシンプル表現
+    this.ctx.fillStyle = speed > 0 ? '#EF4444' : '#9CA3AF'; // 動作時は赤、停止時はグレー
     
-    // 速度表示
-    this.ctx.fillStyle = '#fff';
-    this.ctx.font = '16px monospace';
-    this.ctx.fillText(`${s.telemetry.speed.toFixed(1)} km/h`, x - 40, y - 50);
+    // 車体
+    this.ctx.fillRect(x - 30, y - 20, 60, 15);
+    
+    // ホイール（回転表現）
+    const wheelRotation = s.roadPhase * 10;
+    this.ctx.strokeStyle = '#1F2937';
+    this.ctx.lineWidth = 3;
+    
+    // 前輪
+    this.ctx.beginPath();
+    this.ctx.arc(x + 20, y - 10, 12, 0, Math.PI * 2);
+    this.ctx.stroke();
+    this.ctx.beginPath();
+    this.ctx.moveTo(x + 20 + Math.cos(wheelRotation) * 8, y - 10 + Math.sin(wheelRotation) * 8);
+    this.ctx.lineTo(x + 20 - Math.cos(wheelRotation) * 8, y - 10 - Math.sin(wheelRotation) * 8);
+    this.ctx.stroke();
+    
+    // 後輪
+    this.ctx.beginPath();
+    this.ctx.arc(x - 20, y - 10, 12, 0, Math.PI * 2);
+    this.ctx.stroke();
+    this.ctx.beginPath();
+    this.ctx.moveTo(x - 20 + Math.cos(wheelRotation) * 8, y - 10 + Math.sin(wheelRotation) * 8);
+    this.ctx.lineTo(x - 20 - Math.cos(wheelRotation) * 8, y - 10 - Math.sin(wheelRotation) * 8);
+    this.ctx.stroke();
   }
 
-  drawScenery() {
+  drawStatusOverlay() {
     const { width, height } = this.ctx.canvas;
     const s = this.state;
     
-    // 背景の山々を数式で描画
-    for (let i = 0; i < 10; i++) {
-      const x = (i * 100 + s.parallaxPhase * 10) % (width + 200) - 100;
-      const h = 50 + Math.sin(i * 0.5) * 30;
-      
-      this.ctx.fillStyle = '#4a4a6a';
-      this.ctx.fillRect(x, height - 200 - h, 80, h);
-    }
+    // 半透明オーバーレイ
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    this.ctx.fillRect(10, 10, 300, 80);
+    
+    // ステータステキスト
+    this.ctx.fillStyle = '#FFFFFF';
+    this.ctx.font = '16px monospace';
+    this.ctx.fillText(`速度: ${s.telemetry.speed.toFixed(1)} km/h`, 20, 30);
+    this.ctx.fillText(`パワー: ${Math.round(s.telemetry.power)} W`, 20, 50);
+    this.ctx.fillText(`斜度: ${s.grade >= 0 ? '+' : ''}${s.grade.toFixed(1)}%`, 20, 70);
   }
 }
 
