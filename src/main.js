@@ -1084,45 +1084,60 @@ class Renderer {
 const telemetry = new DummyTelemetry(state);
 const renderer = new Renderer(ctx, state);
 
-boostButton.addEventListener('click', () => {
-  state.boostUntil = state.elapsed + 4.2;
-});
+// 安全なイベントリスナー追加
+if (boostButton) {
+  boostButton.addEventListener('click', () => {
+    state.boostUntil = state.elapsed + 4.2;
+  });
+}
 
-autoModeButton.addEventListener('click', () => {
-  state.debug.manual = false;
-  state.debug.realMode = false;
-  syncTestControls();
-});
+if (autoModeButton) {
+  autoModeButton.addEventListener('click', () => {
+    state.debug.manual = false;
+    state.debug.realMode = false;
+    syncTestControls();
+  });
+}
 
-manualModeButton.addEventListener('click', () => {
-  state.debug.manual = true;
-  state.debug.realMode = false;
-  syncTestControls();
-});
+if (manualModeButton) {
+  manualModeButton.addEventListener('click', () => {
+    state.debug.manual = true;
+    state.debug.realMode = false;
+    syncTestControls();
+  });
+}
 
-realModeButton.addEventListener('click', () => {
-  state.debug.manual = false;
-  state.debug.realMode = true;
-  syncTestControls();
-});
+if (realModeButton) {
+  realModeButton.addEventListener('click', () => {
+    state.debug.manual = false;
+    state.debug.realMode = true;
+    syncTestControls();
+  });
+}
 
-speedSlider.addEventListener('input', (event) => {
-  state.debug.manual = true;
-  state.debug.manualSpeed = Number(event.target.value);
-  syncTestControls();
-});
+if (speedSlider) {
+  speedSlider.addEventListener('input', (event) => {
+    state.debug.manual = true;
+    state.debug.manualSpeed = Number(event.target.value);
+    syncTestControls();
+  });
+}
 
-gradeSlider.addEventListener('input', (event) => {
-  state.debug.manual = true;
-  state.debug.manualGrade = Number(event.target.value);
-  syncTestControls();
-});
+if (gradeSlider) {
+  gradeSlider.addEventListener('input', (event) => {
+    state.debug.manual = true;
+    state.debug.manualGrade = Number(event.target.value);
+    syncTestControls();
+  });
+}
 
-weightSlider.addEventListener('input', (event) => {
-  state.debug.manual = true;
-  state.debug.weight = Number(event.target.value);
-  syncTestControls();
-});
+if (weightSlider) {
+  weightSlider.addEventListener('input', (event) => {
+    state.debug.manual = true;
+    state.debug.weight = Number(event.target.value);
+    syncTestControls();
+  });
+}
 
 presetChips.forEach((chip) => {
   if (chip) {
@@ -1135,7 +1150,8 @@ presetChips.forEach((chip) => {
 });
 
 // Phase A: Power接続ボタン（安全実装）
-powerButton.addEventListener('click', async () => {
+if (powerButton) {
+  powerButton.addEventListener('click', async () => {
   console.log('🔗 Power接続ボタンクリック');
   
   if (!bluetoothManager.isSupported) {
@@ -1176,25 +1192,30 @@ powerButton.addEventListener('click', async () => {
       powerButton.textContent = 'PWR接続';
     }, 5000);
   }
-});
+  });
+}
 
 // Heart Rate接続ボタン（将来実装）
-heartButton.addEventListener('click', async () => {
-  console.log('🔗 Heart Rate接続ボタンクリック');
-  heartButton.textContent = '開発中...';
-  setTimeout(() => {
-    heartButton.textContent = 'HR接続';
-  }, 2000);
-});
+if (heartButton) {
+  heartButton.addEventListener('click', async () => {
+    console.log('🔗 Heart Rate接続ボタンクリック');
+    heartButton.textContent = '開発中...';
+    setTimeout(() => {
+      heartButton.textContent = 'HR接続';
+    }, 2000);
+  });
+}
 
 // Cadence接続ボタン（将来実装）
-cadenceButton.addEventListener('click', async () => {
-  console.log('🔗 Cadence接続ボタンクリック');
-  cadenceButton.textContent = '開発中...';
-  setTimeout(() => {
-    cadenceButton.textContent = 'CAD接続';
-  }, 2000);
-});
+if (cadenceButton) {
+  cadenceButton.addEventListener('click', async () => {
+    console.log('🔗 Cadence接続ボタンクリック');
+    cadenceButton.textContent = '開発中...';
+    setTimeout(() => {
+      cadenceButton.textContent = 'CAD接続';
+    }, 2000);
+  });
+}
 
 syncTestControls();
 
