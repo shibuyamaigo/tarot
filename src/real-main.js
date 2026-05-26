@@ -107,7 +107,6 @@ const cadenceStatus = document.querySelector('#cadenceStatus');
 const powerButton = document.querySelector('#powerButton');
 const heartButton = document.querySelector('#heartButton');
 const cadenceButton = document.querySelector('#cadenceButton');
-const boostButton = document.querySelector('#boostButton');
 
 // ゲーム状態（リアルモード専用）
 const state = {
@@ -115,7 +114,6 @@ const state = {
   distanceKm: 0,
   roadPhase: 0,
   parallaxPhase: 0,
-  boostUntil: 0,
   grade: 0,
   curveDrift: 0,
   telemetry: {
@@ -163,7 +161,6 @@ class RealTelemetry {
     // 時間帯の更新
     const dayLength = 60; // 1分で1日サイクル
     s.timeOfDay = (t % dayLength) / dayLength;
-    const boostActive = t < s.boostUntil;
 
     // リアルデータ専用処理
     let targetPower = 0;
@@ -229,14 +226,7 @@ class RealTelemetry {
       }
     }
 
-    // ブーストボーナス
-    if (boostActive) {
-      targetRealSpeed *= 1.2;
-      // ブースト時のみ追加ログ（1秒制限内）
-      if (t - this.lastLogTime < 0.1) { // 上記ログの直後のみ
-        console.log(`🚀 BOOST効果: ${targetRealSpeed.toFixed(1)}km/h`);
-      }
-    }
+    // BOOSTは削除済み - 完全リアルデータ専用
 
     // スムージング
     const smoothing = 0.96;
@@ -422,12 +412,7 @@ async function init() {
   const telemetry = new RealTelemetry(state);
   const renderer = new RealRenderer(ctx, state);
   
-  // 安全なイベントリスナー追加
-  if (boostButton) {
-    boostButton.addEventListener('click', () => {
-      state.boostUntil = state.elapsed + 4.2;
-    });
-  }
+  // BOOST削除済み - リアルデータのみに集中
 
   // Bluetooth初期化
   const bluetoothManager = new BluetoothManager();
