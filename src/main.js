@@ -1,10 +1,10 @@
 /*
   src/main.js
-  - v2.8.5 - HR統合デバッグ版
-  - リアル心拍データ統合のPhase C実装
-  - デバッグログでBluetooth接続状態とデータ統合状況を表示
+  - v2.8.6 - 画像エラー緊急修正版
+  - 破損画像による描画エラーでゲーム停止する問題を修正
+  - try-catch + フォールバック処理で安全な描画を保証
+  - リアル心拍データ統合のPhase C実装継続中
   - AUTO と MANUAL を切り替え、速度と斜度を直接テストできます。
-  - 速度は簡略物理モデル、速度感は演出プロファイルで気持ちよく見せます。
 */
 
 import './style.css';
@@ -683,10 +683,18 @@ class Renderer {
 
   drawImageTree(x, y, scale, variant) {
     const img = images.trees[variant % images.trees.length];
-    if (img && img.complete) {
-      const w = img.width * scale * 0.8;
-      const h = img.height * scale * 0.8;
-      this.ctx.drawImage(img, Math.round(x - w/2), Math.round(y - h), w, h);
+    if (img && img.complete && !img.src.includes('404') && img.naturalWidth > 0) {
+      try {
+        const w = img.width * scale * 0.8;
+        const h = img.height * scale * 0.8;
+        this.ctx.drawImage(img, Math.round(x - w/2), Math.round(y - h), w, h);
+      } catch (error) {
+        // 画像描画エラー時は数式描画にフォールバック
+        drawTree(this.ctx, x, y, scale);
+      }
+    } else {
+      // 画像が無効時は数式描画
+      drawTree(this.ctx, x, y, scale);
     }
   }
 
@@ -784,24 +792,39 @@ class Renderer {
     const y = this.h - 75; // さらに2段下げて地面に近く
     const scale = 1.2; // サイズ調整
     
-    // 画像の存在確認（フォールバック対応）
+    // 画像の存在確認（安全な描画処理）
     if (images.character[characterState] && images.character[characterState].length > 0) {
       const img = images.character[characterState][frame];
-      if (img && img.complete) {
-        const w = img.width * scale;
-        const h = img.height * scale;
-        // 固定位置に描画（bobなし）
-        this.ctx.drawImage(img, Math.round(x - w/2), Math.round(y - h), w, h);
+      if (img && img.complete && !img.src.includes('404') && img.naturalWidth > 0) {
+        try {
+          const w = img.width * scale;
+          const h = img.height * scale;
+          // 固定位置に描画（bobなし）
+          this.ctx.drawImage(img, Math.round(x - w/2), Math.round(y - h), w, h);
+        } catch (error) {
+          // エラー時は数式描画にフォールバック
+          this.drawMathPlayer();
+        }
+      } else {
+        this.drawMathPlayer();
       }
     } else {
       // フォールバック：normalを使用
       if (images.character.normal && images.character.normal.length > 0) {
         const img = images.character.normal[frame];
-        if (img && img.complete) {
-          const w = img.width * scale;
-          const h = img.height * scale;
-          this.ctx.drawImage(img, Math.round(x - w/2), Math.round(y - h), w, h);
+        if (img && img.complete && !img.src.includes('404') && img.naturalWidth > 0) {
+          try {
+            const w = img.width * scale;
+            const h = img.height * scale;
+            this.ctx.drawImage(img, Math.round(x - w/2), Math.round(y - h), w, h);
+          } catch (error) {
+            this.drawMathPlayer();
+          }
+        } else {
+          this.drawMathPlayer();
         }
+      } else {
+        this.drawMathPlayer();
       }
     }
   }
