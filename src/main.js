@@ -138,7 +138,7 @@ const hud = {
   courseDot: document.querySelector('#courseDot'),
 };
 
-// const bluetoothButton = document.querySelector('#bluetoothButton'); // 削除済み
+// デバッグ: 全要素の存在確認
 const boostButton = document.querySelector('#boostButton');
 const autoModeButton = document.querySelector('#autoModeButton');
 const manualModeButton = document.querySelector('#manualModeButton');
@@ -153,6 +153,20 @@ const gradeSliderValue = document.querySelector('#gradeSliderValue');
 const weightSlider = document.querySelector('#weightSlider');
 const weightSliderValue = document.querySelector('#weightSliderValue');
 const presetChips = Array.from(document.querySelectorAll('.preset-chip'));
+
+console.log('=== 要素存在確認 ===');
+console.log('boostButton:', boostButton);
+console.log('autoModeButton:', autoModeButton);
+console.log('manualModeButton:', manualModeButton);
+console.log('realModeButton:', realModeButton);
+console.log('powerButton:', powerButton);
+console.log('heartButton:', heartButton);
+console.log('cadenceButton:', cadenceButton);
+console.log('speedSlider:', speedSlider);
+console.log('gradeSlider:', gradeSlider);
+console.log('weightSlider:', weightSlider);
+console.log('presetChips length:', presetChips.length);
+console.log('==================');
 
 const palette = {
   skyTop: '#6d9dff',
