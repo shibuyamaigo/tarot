@@ -211,6 +211,9 @@ const state = {
   }
 };
 
+// デバッグ用: stateをwindowに公開
+window.state = state;
+
 seedScenery();
 seedFarScenery();
 seedAmbientRiders();
