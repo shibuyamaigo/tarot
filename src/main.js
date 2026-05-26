@@ -291,17 +291,8 @@ class DummyTelemetry {
       if (s.bluetooth.realCadence !== null) {
         targetCadence = s.bluetooth.realCadence;
       }
-      // REALモード：自然な斜度制御
-      if (s.telemetry.speed > 1.0) {
-        // 走行中：距離ベースで斜度変化
-        const distancePhase = s.distanceKm * 0.5;
-        const baseGrade = Math.sin(distancePhase * 0.8) * 6.0 + Math.sin(distancePhase * 0.3 + 1.2) * 4.0;
-        s.grade = clamp(baseGrade, -15, 20);
-      } else {
-        // 停止中：斜度を徐々に平坦化
-        s.grade = s.grade * 0.995;
-        if (Math.abs(s.grade) < 0.1) s.grade = 0;
-      }
+      // REALモード：フラットコース（GRADE=0%固定）
+      s.grade = 0; // 将来的にスマートローラーのグレード取得予定
       
       // 実パワーから速度を逆算
       targetRealSpeed = solveCyclingSpeedKph(targetPower, s.grade, s.debug.weight || 70);
@@ -1471,16 +1462,28 @@ function updateAmbientRiders(dt, ambientFactor = 1) {
 }
 
 function syncTestControls() {
-  speedSlider.value = String(state.debug.manualSpeed);
-  gradeSlider.value = String(state.debug.manualGrade);
-  weightSlider.value = String(state.debug.weight);
-  speedSliderValue.textContent = `${state.debug.manualSpeed}k`;
-  gradeSliderValue.textContent = `${state.debug.manualGrade >= 0 ? '+' : ''}${state.debug.manualGrade}%`;
-  weightSliderValue.textContent = `${state.debug.weight}kg`;
+  // REAL専用ページでは何もしない
+  if (window.location.pathname.includes('real')) {
+    return;
+  }
+  
+  // TEST MODE要素の安全な更新
+  if (speedSlider) {
+    speedSlider.value = String(state.debug.manualSpeed);
+    speedSliderValue.textContent = `${state.debug.manualSpeed}k`;
+  }
+  if (gradeSlider) {
+    gradeSlider.value = String(state.debug.manualGrade);
+    gradeSliderValue.textContent = `${state.debug.manualGrade >= 0 ? '+' : ''}${state.debug.manualGrade}%`;
+  }
+  if (weightSlider) {
+    weightSlider.value = String(state.debug.weight);
+    weightSliderValue.textContent = `${state.debug.weight}kg`;
+  }
 
-  autoModeButton.classList.toggle('is-active', !state.debug.manual && !state.debug.realMode);
-  manualModeButton.classList.toggle('is-active', state.debug.manual);
-  realModeButton.classList.toggle('is-active', state.debug.realMode);
+  if (autoModeButton) autoModeButton.classList.toggle('is-active', !state.debug.manual && !state.debug.realMode);
+  if (manualModeButton) manualModeButton.classList.toggle('is-active', state.debug.manual);
+  if (realModeButton) realModeButton.classList.toggle('is-active', state.debug.realMode);
 
   presetChips.forEach((chip) => {
     if (chip) {
