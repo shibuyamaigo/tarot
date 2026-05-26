@@ -138,7 +138,7 @@ const hud = {
   courseDot: document.querySelector('#courseDot'),
 };
 
-const bluetoothButton = document.querySelector('#bluetoothButton');
+// const bluetoothButton = document.querySelector('#bluetoothButton'); // 削除済み
 const boostButton = document.querySelector('#boostButton');
 const autoModeButton = document.querySelector('#autoModeButton');
 const manualModeButton = document.querySelector('#manualModeButton');
@@ -1118,25 +1118,25 @@ presetChips.forEach((chip) => {
   });
 });
 
-// Phase A: Bluetooth接続ボタン（安全実装）
-bluetoothButton.addEventListener('click', async () => {
-  console.log('🔗 Bluetooth接続ボタンクリック');
+// Phase A: Power接続ボタン（安全実装）
+powerButton.addEventListener('click', async () => {
+  console.log('🔗 Power接続ボタンクリック');
   
   if (!bluetoothManager.isSupported) {
     console.warn('❌ Web Bluetooth not supported');
-    bluetoothButton.textContent = '❌非対応';
+    powerButton.textContent = '❌非対応';
     setTimeout(() => {
-      bluetoothButton.textContent = 'BT接続';
+      powerButton.textContent = 'PWR接続';
     }, 3000);
     return;
   }
   
   try {
     // 接続中表示
-    bluetoothButton.textContent = '接続中...';
-    bluetoothButton.disabled = true;
+    powerButton.textContent = '接続中...';
+    powerButton.disabled = true;
     
-    console.log('📱 Bluetooth接続開始...');
+    console.log('📱 Power接続開始...');
     
     // Phase B: 実際のBluetooth接続実行
     console.log('⚡ Phase B: 実Bluetooth接続開始');
@@ -1145,19 +1145,19 @@ bluetoothButton.addEventListener('click', async () => {
     
     // 接続成功
     state.bluetooth.connected = true;
-    bluetoothButton.textContent = '✅接続済み';
-    bluetoothButton.classList.add('bluetooth-connected');
-    bluetoothButton.disabled = false;
+    powerButton.textContent = '✅接続済み';
+    powerButton.classList.add('bluetooth-connected');
+    powerButton.disabled = false;
     
     console.log(`🎉 接続成功: ${device.name}`);
     
   } catch (error) {
     console.error('❌ Bluetooth接続エラー:', error);
-    bluetoothButton.textContent = '❌失敗';
-    bluetoothButton.disabled = false;
+    powerButton.textContent = '❌失敗';
+    powerButton.disabled = false;
     
     setTimeout(() => {
-      bluetoothButton.textContent = 'BT接続';
+      powerButton.textContent = 'PWR接続';
     }, 5000);
   }
 });
