@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#121826" />
     <link rel="manifest" href="./assets/manifest-CRZwymuU-CRZwymuU.webmanifest" />
-    <title>BITRIDERZ v2.8.6 - 緊急修正版</title>
-    <script type="module" crossorigin src="./assets/main-BDPDIRHJ.js"></script>
+    <title>BITRIDERZ REAL v3.0 - 完全リアルデータ専用</title>
+    <script type="module" crossorigin src="./assets/real-DVPgf1S5.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="stylesheet" crossorigin href="./assets/main-CKcAfS7T.css">
   </head>
@@ -14,8 +14,9 @@
     <div class="app-shell">
       <header class="topbar">
         <div>
-          <p class="eyebrow">BITRIDERZ CYCLING TRAINER</p>
-          <h1>BITRIDERZ v2.8.6</h1>
+          <p class="eyebrow">BITRIDERZ REAL MODE</p>
+          <h1>BITRIDERZ REAL v3.0</h1>
+          <p class="warning">⚠️ センサー必須 - ダミーデータ無し</p>
         </div>
         <div class="controls-group">
           <button id="powerButton" class="control-button" type="button">PWR接続</button>
@@ -83,55 +84,25 @@
 
             <canvas id="gameCanvas" width="960" height="720" aria-label="BITRIDERZ game view"></canvas>
 
-            <section class="test-dock" aria-label="速度テストパネル">
-              <div class="test-dock-header">
-                <span class="test-dock-title">TEST MODE</span>
-                <div class="test-toggle-group">
-                  <button id="autoModeButton" class="test-toggle is-active" type="button">AUTO</button>
-                  <button id="manualModeButton" class="test-toggle" type="button">MANUAL</button>
-                  <button id="realModeButton" class="test-toggle" type="button">REAL</button>
-                </div>
+            <!-- TEST MODE完全削除 - リアルデータのみ -->
+            <section class="real-status" aria-label="センサー接続状況">
+              <div class="real-status-header">
+                <span class="real-status-title">SENSOR STATUS</span>
               </div>
-
-              <div class="test-row">
-                <label class="test-label" for="speedSlider">SPD</label>
-                <input id="speedSlider" class="test-slider" type="range" min="0" max="100" step="10" value="40" />
-                <strong id="speedSliderValue" class="test-value">40</strong>
+              <div class="sensor-row">
+                <span class="sensor-label">POWER</span>
+                <span id="powerStatus" class="sensor-status">未接続</span>
               </div>
-
-              <div class="test-row">
-                <label class="test-label" for="gradeSlider">GRADE</label>
-                <input id="gradeSlider" class="test-slider" type="range" min="-20" max="25" step="1" value="0" />
-                <strong id="gradeSliderValue" class="test-value">0%</strong>
+              <div class="sensor-row">
+                <span class="sensor-label">HEART RATE</span>
+                <span id="heartStatus" class="sensor-status">未接続</span>
               </div>
-
-              <div class="test-row">
-                <label class="test-label" for="weightSlider">WEIGHT</label>
-                <input id="weightSlider" class="test-slider" type="range" min="40" max="120" step="1" value="70" />
-                <strong id="weightSliderValue" class="test-value">70kg</strong>
+              <div class="sensor-row">
+                <span class="sensor-label">CADENCE</span>
+                <span id="cadenceStatus" class="sensor-status">未接続</span>
               </div>
-
-              <div class="test-row">
-                <span class="test-label">TIME</span>
-                <div class="test-toggle-group">
-                  <button id="fastDayButton" class="test-toggle is-active" type="button">FAST</button>
-                  <button id="slowDayButton" class="test-toggle" type="button">REAL</button>
-                </div>
-                <span class="test-value" id="daySpeedValue">1min</span>
-              </div>
-
-              <div class="test-presets" aria-label="速度プリセット">
-                <button class="preset-chip" type="button" data-speed="0">0</button>
-                <button class="preset-chip" type="button" data-speed="10">10</button>
-                <button class="preset-chip" type="button" data-speed="20">20</button>
-                <button class="preset-chip" type="button" data-speed="30">30</button>
-                <button class="preset-chip" type="button" data-speed="40">40</button>
-                <button class="preset-chip" type="button" data-speed="50">50</button>
-                <button class="preset-chip" type="button" data-speed="60">60</button>
-                <button class="preset-chip" type="button" data-speed="70">70</button>
-                <button class="preset-chip" type="button" data-speed="80">80</button>
-                <button class="preset-chip" type="button" data-speed="90">90</button>
-                <button class="preset-chip" type="button" data-speed="100">100</button>
+              <div class="warning-text">
+                ⚠️ センサー未接続時は速度0km/h
               </div>
             </section>
 

@@ -1,0 +1,19 @@
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[[redirects]]
+  from = "/real"
+  to = "/real.html"
+  status = 200
+
+[[redirects]]
+  from = "/real/"
+  to = "/real.html"
+  status = 200
+
+# SPA fallback (既存のページ用)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
