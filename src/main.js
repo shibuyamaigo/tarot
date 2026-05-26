@@ -1162,6 +1162,24 @@ powerButton.addEventListener('click', async () => {
   }
 });
 
+// Heart Rate接続ボタン（将来実装）
+heartButton.addEventListener('click', async () => {
+  console.log('🔗 Heart Rate接続ボタンクリック');
+  heartButton.textContent = '開発中...';
+  setTimeout(() => {
+    heartButton.textContent = 'HR接続';
+  }, 2000);
+});
+
+// Cadence接続ボタン（将来実装）
+cadenceButton.addEventListener('click', async () => {
+  console.log('🔗 Cadence接続ボタンクリック');
+  cadenceButton.textContent = '開発中...';
+  setTimeout(() => {
+    cadenceButton.textContent = 'CAD接続';
+  }, 2000);
+});
+
 syncTestControls();
 
 let last = performance.now();
