@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#121826" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <title>RetroRide MVP v2.7</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">RETRO CYCLING TRAINER</p>
+          <h1>RetroRide MVP v2.7</h1>
+        </div>
+        <button id="boostButton" class="control-button" type="button">BOOST</button>
+      </header>
+
+      <main class="layout">
+        <section class="center-stage">
+          <div class="game-frame">
+            <div class="hud-strip" aria-label="race HUD">
+              <div class="hud-primary">
+                <div class="hud-main speed-block">
+                  <span class="hud-title">SPD</span>
+                  <strong id="speedValue">0.0</strong>
+                  <span class="hud-unit">km/h</span>
+                  <div class="meter-track"><div id="speedBar" class="meter-fill cyan"></div></div>
+                </div>
+
+                <div class="hud-main power-block">
+                  <span class="hud-title">PWR</span>
+                  <strong id="powerValue">0</strong>
+                  <span class="hud-unit">w</span>
+                  <div class="meter-track"><div id="powerBar" class="meter-fill pink"></div></div>
+                </div>
+              </div>
+
+              <div class="hud-secondary">
+                <div class="hud-mini">
+                  <span class="hud-mini-label">CAD</span>
+                  <strong id="cadenceValue">0</strong>
+                  <span class="hud-mini-unit">rpm</span>
+                </div>
+                <div class="hud-mini">
+                  <span class="hud-mini-label">HR</span>
+                  <strong id="heartValue">0</strong>
+                  <span class="hud-mini-unit">bpm</span>
+                </div>
+                <div class="hud-mini">
+                  <span class="hud-mini-label">GRADE</span>
+                  <strong id="gradeValue">0.0%</strong>
+                  <span class="hud-mini-unit">slope</span>
+                </div>
+                <div class="hud-mini">
+                  <span class="hud-mini-label">TIME</span>
+                  <strong id="timerValue">00:00</strong>
+                  <span class="hud-mini-unit">elapsed</span>
+                </div>
+                <div class="hud-mini">
+                  <span class="hud-mini-label">DIST</span>
+                  <strong id="distanceValue">0.00</strong>
+                  <span class="hud-mini-unit">km</span>
+                </div>
+                <div class="hud-mini course-box">
+                  <span class="hud-mini-label">COURSE</span>
+                  <div class="mini-course">
+                    <div class="mini-course-loop"></div>
+                    <div id="courseDot" class="mini-course-dot"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <canvas id="gameCanvas" width="960" height="720" aria-label="RetroRide game view"></canvas>
+
+            <section class="test-dock" aria-label="速度テストパネル">
+              <div class="test-dock-header">
+                <span class="test-dock-title">TEST MODE</span>
+                <div class="test-toggle-group">
+                  <button id="autoModeButton" class="test-toggle is-active" type="button">AUTO</button>
+                  <button id="manualModeButton" class="test-toggle" type="button">MANUAL</button>
+                </div>
+              </div>
+
+              <div class="test-row">
+                <label class="test-label" for="speedSlider">SPD</label>
+                <input id="speedSlider" class="test-slider" type="range" min="0" max="100" step="10" value="40" />
+                <strong id="speedSliderValue" class="test-value">40</strong>
+              </div>
+
+              <div class="test-row">
+                <label class="test-label" for="gradeSlider">GRADE</label>
+                <input id="gradeSlider" class="test-slider" type="range" min="-10" max="10" step="1" value="0" />
+                <strong id="gradeSliderValue" class="test-value">0%</strong>
+              </div>
+
+              <div class="test-presets" aria-label="速度プリセット">
+                <button class="preset-chip" type="button" data-speed="0">0</button>
+                <button class="preset-chip" type="button" data-speed="10">10</button>
+                <button class="preset-chip" type="button" data-speed="20">20</button>
+                <button class="preset-chip" type="button" data-speed="30">30</button>
+                <button class="preset-chip" type="button" data-speed="40">40</button>
+                <button class="preset-chip" type="button" data-speed="50">50</button>
+                <button class="preset-chip" type="button" data-speed="60">60</button>
+                <button class="preset-chip" type="button" data-speed="70">70</button>
+                <button class="preset-chip" type="button" data-speed="80">80</button>
+                <button class="preset-chip" type="button" data-speed="90">90</button>
+                <button class="preset-chip" type="button" data-speed="100">100</button>
+              </div>
+            </section>
+
+            <div class="scanlines" aria-hidden="true"></div>
+            <div class="screen-glow" aria-hidden="true"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

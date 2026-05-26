@@ -1,0 +1,452 @@
+/*
+  src/style.css
+  - v2.6 では HUD のドット絵感を強めるため、ビットマップ風フォントを導入しています。
+  - 目標は「小さいのに読める」「レトロなのに安っぽくない」HUD です。
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+  --bg: #0b1020;
+  --text: #f2f6ff;
+  --muted: #a3aec7;
+  --cyan: #77f0ff;
+  --pink: #ff79c8;
+  --gold: #ffd76b;
+  --red: #ff7d7d;
+  --shadow: 0 18px 70px rgba(0, 0, 0, 0.42);
+  --pixel-font: "Press Start 2P", "Courier New", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top, rgba(111, 240, 255, 0.08), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(255, 121, 200, 0.08), transparent 24%),
+    linear-gradient(180deg, #0d1426 0%, #0a1120 58%, #070b14 100%);
+  color: var(--text);
+  font-family: Inter, "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(circle at center, black 42%, transparent 100%);
+}
+
+button {
+  font: inherit;
+}
+
+.app-shell {
+  width: min(1180px, calc(100vw - 24px));
+  margin: 0 auto;
+  padding: 18px 0 28px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--cyan);
+  letter-spacing: 0.16em;
+  font-size: 0.62rem;
+  font-family: var(--pixel-font);
+  text-shadow: 2px 0 0 rgba(10, 16, 32, 0.9);
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(1.45rem, 2.2vw, 2.2rem);
+  line-height: 1.05;
+}
+
+.control-button {
+  border: 1px solid rgba(255,255,255,0.16);
+  background: linear-gradient(180deg, rgba(255, 219, 116, 0.18), rgba(255, 121, 200, 0.1));
+  color: var(--text);
+  padding: 12px 18px;
+  border-radius: 999px;
+  box-shadow: 0 8px 28px rgba(255, 121, 200, 0.12);
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  font-family: var(--pixel-font);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+}
+
+.control-button:hover,
+.control-button:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(255, 215, 107, 0.16);
+}
+
+.layout,
+.center-stage {
+  display: grid;
+}
+
+.game-frame {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 28px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: var(--shadow);
+  background: rgba(12, 17, 28, 0.8);
+  backdrop-filter: blur(10px);
+}
+
+#gameCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+}
+
+.hud-strip {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1.08fr 1.42fr;
+  gap: 4px;
+  padding: 4px;
+  min-height: 56px;
+  max-height: 11.8%;
+  background: rgba(6, 8, 14, 0.58);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(10px);
+}
+
+.hud-primary,
+.hud-secondary {
+  min-width: 0;
+}
+
+.hud-primary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.hud-secondary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.hud-main,
+.hud-mini {
+  min-width: 0;
+  background: rgba(14, 18, 28, 0.48);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 4px 6px;
+}
+
+.hud-title,
+.hud-mini-label {
+  display: block;
+  color: #e8efff;
+  letter-spacing: 0.08em;
+  font-size: 0.42rem;
+  font-family: var(--pixel-font);
+  text-shadow: 1px 0 0 rgba(6, 8, 14, 0.95);
+}
+
+.hud-unit,
+.hud-mini-unit {
+  display: block;
+  color: rgba(242, 246, 255, 0.66);
+  font-size: 0.42rem;
+  font-family: var(--pixel-font);
+}
+
+.hud-main strong,
+.hud-mini strong {
+  display: block;
+  line-height: 1;
+}
+
+.hud-main strong {
+  font-size: clamp(0.82rem, 1.08vw, 1.04rem);
+  margin: 2px 0 1px;
+  font-family: var(--pixel-font);
+  line-height: 1.25;
+  text-shadow: 2px 2px 0 rgba(8, 12, 22, 0.92);
+}
+
+.speed-block strong {
+  color: var(--cyan);
+}
+
+.power-block strong {
+  color: var(--pink);
+}
+
+.hud-mini strong {
+  font-size: clamp(0.52rem, 0.68vw, 0.72rem);
+  margin: 2px 0 1px;
+  color: var(--gold);
+  font-family: var(--pixel-font);
+  line-height: 1.25;
+  text-shadow: 1px 1px 0 rgba(8, 12, 22, 0.92);
+}
+
+.meter-track {
+  margin-top: 3px;
+  height: 5px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.05);
+  overflow: hidden;
+  image-rendering: pixelated;
+}
+
+.meter-fill {
+  height: 100%;
+  width: 0%;
+  transition: width 160ms linear;
+}
+
+.meter-fill.cyan {
+  background: linear-gradient(90deg, #5ed9ff, #b7f9ff);
+}
+
+.meter-fill.pink {
+  background: linear-gradient(90deg, #ff79c8, #ffd76b);
+}
+
+.course-box {
+  display: grid;
+  align-content: start;
+}
+
+.mini-course {
+  position: relative;
+  margin-top: 4px;
+  height: 14px;
+}
+
+.mini-course-loop {
+  position: absolute;
+  inset: 3px 7px;
+  border: 1px solid rgba(255, 167, 128, 0.9);
+  border-radius: 999px;
+}
+
+.mini-course-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--cyan);
+  top: 2px;
+  left: 18px;
+  box-shadow: 0 0 8px rgba(119, 240, 255, 0.9);
+  transform: translate(-50%, -50%);
+}
+
+.test-dock {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 3;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: rgba(5, 8, 14, 0.62);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(8px);
+}
+
+.test-dock,
+.test-dock button,
+.test-dock input {
+  font-family: var(--pixel-font);
+}
+
+.test-dock-header,
+.test-row,
+.test-presets,
+.test-toggle-group {
+  display: flex;
+  align-items: center;
+}
+
+.test-dock-header {
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.test-dock-title,
+.test-label,
+.test-value {
+  font-size: 0.46rem;
+  letter-spacing: 0.06em;
+}
+
+.test-dock-title {
+  color: var(--cyan);
+}
+
+.test-row {
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.test-label {
+  width: 42px;
+  color: rgba(242, 246, 255, 0.82);
+}
+
+.test-value {
+  width: 48px;
+  text-align: right;
+  color: var(--gold);
+}
+
+.test-slider {
+  flex: 1;
+  accent-color: #77f0ff;
+}
+
+.test-toggle-group {
+  gap: 6px;
+}
+
+.test-toggle,
+.preset-chip {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(20, 28, 44, 0.62);
+  color: rgba(242, 246, 255, 0.82);
+  padding: 5px 8px;
+  border-radius: 999px;
+  font-size: 0.42rem;
+  cursor: pointer;
+}
+
+.test-toggle.is-active,
+.preset-chip.is-active {
+  background: linear-gradient(180deg, rgba(94, 217, 255, 0.22), rgba(255, 215, 107, 0.18));
+  color: #ffffff;
+  border-color: rgba(119, 240, 255, 0.4);
+}
+
+.test-presets {
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.scanlines,
+.screen-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.scanlines {
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255,255,255,0.04) 0px,
+    rgba(255,255,255,0.04) 1px,
+    transparent 2px,
+    transparent 4px
+  );
+  mix-blend-mode: soft-light;
+  opacity: 0.22;
+}
+
+.screen-glow {
+  background:
+    radial-gradient(circle at 50% 24%, rgba(255, 215, 107, 0.14), transparent 24%),
+    radial-gradient(circle at 50% 72%, rgba(119, 240, 255, 0.1), transparent 32%),
+    linear-gradient(180deg, rgba(255,255,255,0.035), transparent 24%, transparent 76%, rgba(255,255,255,0.02));
+}
+
+@media (max-width: 980px) {
+  .hud-strip {
+    grid-template-columns: 1fr;
+    max-height: none;
+  }
+
+  .hud-secondary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .test-dock {
+    position: static;
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    width: min(100vw - 12px, 1180px);
+    padding-top: 10px;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .game-frame {
+    border-radius: 20px;
+  }
+
+  .hud-strip {
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    padding: 4px;
+    gap: 4px;
+  }
+
+  .hud-primary,
+  .hud-secondary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .test-dock {
+    left: 6px;
+    right: 6px;
+    bottom: 6px;
+    padding: 7px 8px;
+  }
+
+  .test-dock-header,
+  .test-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .test-label,
+  .test-value {
+    width: auto;
+  }
+}
