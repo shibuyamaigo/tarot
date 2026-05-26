@@ -242,8 +242,10 @@ class DummyTelemetry {
     let targetHeart;
     if (s.bluetooth.connected && s.bluetooth.realHeartRate !== null) {
       targetHeart = s.bluetooth.realHeartRate; // リアルデータを使用
+      console.log(`✅ リアル心拍使用: ${targetHeart} bpm`);
     } else {
       targetHeart = 130 + heartWave + (boostActive ? 7 : 0); // ダミーデータ
+      console.log(`⚠️ ダミー心拍使用: Bluetooth接続=${s.bluetooth.connected}, リアルHR=${s.bluetooth.realHeartRate}`);
     }
     
     let targetRealSpeed = 0;
