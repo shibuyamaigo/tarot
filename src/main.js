@@ -1159,7 +1159,12 @@ bluetoothManager.setCallbacks({
     console.log(`💗 Heart Rate: ${hr} bpm`);
     state.bluetooth.realHeartRate = hr;
     state.bluetooth.connected = true; // 心拍データ受信 = 接続成功
+    
+    // デバッグ用: stateを確実にwindowに公開
+    window.state = state;
+    
     console.log(`🔄 Bluetooth状態更新: connected=${state.bluetooth.connected}`);
+    console.log(`🔄 window.state公開確認:`, window.state?.bluetooth?.connected);
   },
   
   onPowerData: (power) => {
