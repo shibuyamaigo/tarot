@@ -142,6 +142,10 @@ const bluetoothButton = document.querySelector('#bluetoothButton');
 const boostButton = document.querySelector('#boostButton');
 const autoModeButton = document.querySelector('#autoModeButton');
 const manualModeButton = document.querySelector('#manualModeButton');
+const realModeButton = document.querySelector('#realModeButton');
+const powerButton = document.querySelector('#powerButton');
+const heartButton = document.querySelector('#heartButton');
+const cadenceButton = document.querySelector('#cadenceButton');
 const speedSlider = document.querySelector('#speedSlider');
 const speedSliderValue = document.querySelector('#speedSliderValue');
 const gradeSlider = document.querySelector('#gradeSlider');
@@ -192,6 +196,7 @@ const state = {
   ambientRiders: [],
   debug: {
     manual: false,
+    realMode: false,
     manualSpeed: 40,
     manualGrade: 0,
     weight: 70,
@@ -254,7 +259,22 @@ class DummyTelemetry {
     
     let targetRealSpeed = 0;
 
-    if (s.debug.manual) {
+    if (s.debug.realMode) {
+      // REALモード: Bluetoothデータを優先使用
+      if (s.bluetooth.realPower !== null) {
+        targetPower = s.bluetooth.realPower;
+        console.log(`🔥 REAL PWR: ${targetPower}W`);
+      }
+      if (s.bluetooth.realCadence !== null) {
+        targetCadence = s.bluetooth.realCadence;
+      }
+      // REALモードでは斜度は自動生成（将来的にスマートローラーから取得）
+      const baseGrade = Math.sin(t * 0.075) * 8.0 + Math.sin(t * 0.031 + 1.4) * 5.5;
+      s.grade = clamp(baseGrade, -20, 25);
+      // 実パワーから速度を逆算
+      targetRealSpeed = solveCyclingSpeedKph(targetPower, s.grade, s.debug.weight || 70);
+      console.log(`🚴 REAL速度計算: ${targetRealSpeed.toFixed(1)}km/h (${targetPower}W, ${s.grade.toFixed(1)}%)`);
+    } else if (s.debug.manual) {
       s.grade = s.debug.manualGrade;
       targetRealSpeed = s.debug.manualSpeed;
       targetPower = estimateCyclingPowerWatts(targetRealSpeed, s.grade, s.debug.weight || 70);
@@ -1056,11 +1076,19 @@ boostButton.addEventListener('click', () => {
 
 autoModeButton.addEventListener('click', () => {
   state.debug.manual = false;
+  state.debug.realMode = false;
   syncTestControls();
 });
 
 manualModeButton.addEventListener('click', () => {
   state.debug.manual = true;
+  state.debug.realMode = false;
+  syncTestControls();
+});
+
+realModeButton.addEventListener('click', () => {
+  state.debug.manual = false;
+  state.debug.realMode = true;
   syncTestControls();
 });
 
@@ -1367,8 +1395,9 @@ function syncTestControls() {
   gradeSliderValue.textContent = `${state.debug.manualGrade >= 0 ? '+' : ''}${state.debug.manualGrade}%`;
   weightSliderValue.textContent = `${state.debug.weight}kg`;
 
-  autoModeButton.classList.toggle('is-active', !state.debug.manual);
+  autoModeButton.classList.toggle('is-active', !state.debug.manual && !state.debug.realMode);
   manualModeButton.classList.toggle('is-active', state.debug.manual);
+  realModeButton.classList.toggle('is-active', state.debug.realMode);
 
   presetChips.forEach((chip) => {
     const chipSpeed = Number(chip.dataset.speed || 0);

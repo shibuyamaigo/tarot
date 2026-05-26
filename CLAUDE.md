@@ -239,6 +239,33 @@ function estimateCyclingPowerWatts(speedKph, gradePercent) {
 
 詳細は `BLUETOOTH-INTEGRATION-PLAN.md` 参照。
 
+### 失敗L-005: TEST MODEによるリアルデータ無視問題
+**問題**:
+- Bluetoothから実パワーデータ（45-46W）受信中だがゲームに反映されない
+- TEST MODE（AUTO/MANUAL）がダミーデータを強制生成
+- リアルデータ統合にREAL MODEが不足
+
+**根本原因**:
+```javascript
+// MANUAL/AUTOモードでダミーデータを強制生成
+if (s.debug.manual) {
+  targetPower = estimateCyclingPowerWatts(targetRealSpeed, s.grade, s.debug.weight || 70);
+  // ← 実Bluetoothデータを無視
+} else {
+  // AUTOモードでもダミーデータ生成
+}
+```
+
+**学び**:
+- Bluetoothデータ受信 ≠ ゲーム統合
+- TEST MODEが開発用からプロダクト機能に変化
+- リアルセンサーモードの明示的実装が必須
+
+**対策**:
+- REAL MODEを第3の選択肢として追加
+- 実データ優先度の明確化
+- Bluetooth接続状態に応じた自動モード切替
+
 ---
 
 ## 📐 コーディング規約
