@@ -1111,11 +1111,13 @@ weightSlider.addEventListener('input', (event) => {
 });
 
 presetChips.forEach((chip) => {
-  chip.addEventListener('click', () => {
-    state.debug.manual = true;
-    state.debug.manualSpeed = Number(chip.dataset.speed || 0);
-    syncTestControls();
-  });
+  if (chip) {
+    chip.addEventListener('click', () => {
+      state.debug.manual = true;
+      state.debug.manualSpeed = Number(chip.dataset.speed || 0);
+      syncTestControls();
+    });
+  }
 });
 
 // Phase A: Power接続ボタン（安全実装）
@@ -1418,8 +1420,10 @@ function syncTestControls() {
   realModeButton.classList.toggle('is-active', state.debug.realMode);
 
   presetChips.forEach((chip) => {
-    const chipSpeed = Number(chip.dataset.speed || 0);
-    chip.classList.toggle('is-active', state.debug.manual && chipSpeed === state.debug.manualSpeed);
+    if (chip) {
+      const chipSpeed = Number(chip.dataset.speed || 0);
+      chip.classList.toggle('is-active', state.debug.manual && chipSpeed === state.debug.manualSpeed);
+    }
   });
 }
 
