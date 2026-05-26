@@ -237,7 +237,15 @@ class DummyTelemetry {
 
     let targetPower = 198 + powerWaveA + powerWaveB + boostPower;
     let targetCadence = 84 + cadenceWave + (boostActive ? 8 : 0);
-    let targetHeart = 130 + heartWave + (boostActive ? 7 : 0);
+    
+    // Phase C: リアル心拍データの統合（安全実装）
+    let targetHeart;
+    if (s.bluetooth.connected && s.bluetooth.realHeartRate !== null) {
+      targetHeart = s.bluetooth.realHeartRate; // リアルデータを使用
+    } else {
+      targetHeart = 130 + heartWave + (boostActive ? 7 : 0); // ダミーデータ
+    }
+    
     let targetRealSpeed = 0;
 
     if (s.debug.manual) {
