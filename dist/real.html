@@ -6,7 +6,29 @@
     <meta name="theme-color" content="#121826" />
     <link rel="manifest" href="./assets/manifest-CRZwymuU-CRZwymuU.webmanifest" />
     <title>BITRIDERZ REAL v3.1 - 純粋リアルデータ専用</title>
-    <script type="module" crossorigin src="./assets/real-T87JIjY7.js"></script>
+    <script>
+      // REALモード自動起動
+      window.addEventListener('load', () => {
+        // 自動的にREALモードに設定
+        setTimeout(() => {
+          if (window.state) {
+            window.state.debug.realMode = true;
+            window.state.debug.manual = false;
+            console.log('🔥 REAL MODE自動起動');
+            
+            // UI同期（もし要素があれば）
+            const realButton = document.querySelector('#realModeButton');
+            const autoButton = document.querySelector('#autoModeButton');
+            const manualButton = document.querySelector('#manualModeButton');
+            
+            if (realButton) realButton.classList.add('is-active');
+            if (autoButton) autoButton.classList.remove('is-active');
+            if (manualButton) manualButton.classList.remove('is-active');
+          }
+        }, 1000);
+      });
+    </script>
+    <script type="module" crossorigin src="./assets/real-DOtWqvid.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="stylesheet" crossorigin href="./assets/main-CKcAfS7T.css">
   </head>

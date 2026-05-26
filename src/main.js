@@ -244,7 +244,16 @@ class DummyTelemetry {
 
   update(dt) {
     const s = this.state;
-    s.elapsed += dt;
+    
+    // REALモード：漕いでいる時間のみTIME加算
+    if (s.debug.realMode) {
+      if (s.telemetry.speed > 0.5) {
+        s.elapsed += dt; // 走行中のみ時間カウント
+      }
+    } else {
+      s.elapsed += dt; // 通常モードは常時カウント
+    }
+    
     const t = s.elapsed;
     
     // 時間帯の更新
@@ -282,12 +291,31 @@ class DummyTelemetry {
       if (s.bluetooth.realCadence !== null) {
         targetCadence = s.bluetooth.realCadence;
       }
-      // REALモードでは斜度は自動生成（将来的にスマートローラーから取得）
-      const baseGrade = Math.sin(t * 0.075) * 8.0 + Math.sin(t * 0.031 + 1.4) * 5.5;
-      s.grade = clamp(baseGrade, -20, 25);
+      // REALモード：自然な斜度制御
+      if (s.telemetry.speed > 1.0) {
+        // 走行中：距離ベースで斜度変化
+        const distancePhase = s.distanceKm * 0.5;
+        const baseGrade = Math.sin(distancePhase * 0.8) * 6.0 + Math.sin(distancePhase * 0.3 + 1.2) * 4.0;
+        s.grade = clamp(baseGrade, -15, 20);
+      } else {
+        // 停止中：斜度を徐々に平坦化
+        s.grade = s.grade * 0.995;
+        if (Math.abs(s.grade) < 0.1) s.grade = 0;
+      }
+      
       // 実パワーから速度を逆算
       targetRealSpeed = solveCyclingSpeedKph(targetPower, s.grade, s.debug.weight || 70);
-      console.log(`🚴 REAL速度計算: ${targetRealSpeed.toFixed(1)}km/h (${targetPower}W, ${s.grade.toFixed(1)}%)`);
+      
+      // ログ制御（1秒に1回）
+      if (!this.lastLogTime) this.lastLogTime = 0;
+      if (t - this.lastLogTime >= 1.0) {
+        if (targetPower > 0) {
+          console.log(`🚴 REAL速度計算: ${targetRealSpeed.toFixed(1)}km/h (${targetPower}W, ${s.grade.toFixed(1)}%)`);
+        } else {
+          console.log(`⚠️ センサー未接続: 速度0km/h`);
+        }
+        this.lastLogTime = t;
+      }
     } else if (s.debug.manual) {
       s.grade = s.debug.manualGrade;
       targetRealSpeed = s.debug.manualSpeed;
