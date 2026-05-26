@@ -42,7 +42,7 @@ async function loadImages() {
     for (const state of characterStates) {
       for (let i = 1; i <= 2; i++) {
         const img = new Image();
-        img.src = `/image/main/${state}/${i}.png`;
+        img.src = `./image/main/${state}/${i}.png`;
         await new Promise((resolve, reject) => {
           img.onload = () => resolve();
           img.onerror = () => {
@@ -58,7 +58,7 @@ async function loadImages() {
     const treeFiles = ['green1.png', 'green2.png', 'pink1.png', 'summer1.png', 'summer2.png', 'yerrow1.png'];
     for (const fileName of treeFiles) {
       const img = new Image();
-      img.src = `/image/wood/${fileName}`;
+      img.src = `./image/wood/${fileName}`;
       await new Promise((resolve) => {
         img.onload = () => resolve();
         img.onerror = () => {
@@ -71,7 +71,7 @@ async function loadImages() {
     
     // 建物の画像読み込み
     const houseImg = new Image();
-    houseImg.src = `/image/etc/house1.png`;
+    houseImg.src = `./image/etc/house1.png`;
     await new Promise((resolve) => {
       houseImg.onload = () => resolve();
       houseImg.onerror = () => {
@@ -85,7 +85,7 @@ async function loadImages() {
     const signFiles = ['hyoushiki1.png', 'caution.png'];
     for (const fileName of signFiles) {
       const img = new Image();
-      img.src = `/image/etc/${fileName}`;
+      img.src = `./image/etc/${fileName}`;
       await new Promise((resolve) => {
         img.onload = () => resolve();
         img.onerror = () => {
@@ -100,7 +100,7 @@ async function loadImages() {
     const flowerFiles = ['pink.png', 'white.png', 'yerrow.png'];
     for (const fileName of flowerFiles) {
       const img = new Image();
-      img.src = `/image/etc/flower/${fileName}`;
+      img.src = `./image/etc/flower/${fileName}`;
       await new Promise((resolve) => {
         img.onload = () => resolve();
         img.onerror = () => {
